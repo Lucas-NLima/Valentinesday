@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Você 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blush: #f2c4ce;
+    --rose: #e8869a;
+    --deep-rose: #c05c7e;
+    --petal-light: #fce4ec;
+    --petal-mid: #f48fb1;
+    --cream: #fdf6f0;
+    --gold: #c9a96e;
+    --dark: #2a1a2e;
+    --midnight: #1a0f1e;
+    --soft-purple: #6b3fa0;
+    --lavender: #d4b8e0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--midnight);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+  }
+  .cursor::before {
+    content: '🌸';
+    font-size: 18px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ===================== INTRO SCREEN ===================== */
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: var(--midnight);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+  }
+  #intro.hidden { opacity: 0; visibility: hidden; }
+
+  .intro-petals {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .intro-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(3rem, 8vw, 7rem);
+    color: transparent;
+    background: linear-gradient(135deg, var(--blush), var(--gold), var(--rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-align: center;
+    animation: titleReveal 2s ease forwards;
+    opacity: 0;
+  }
+  @keyframes titleReveal {
+    0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .intro-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--lavender);
+    margin-top: 1rem;
+    animation: titleReveal 2s ease 0.5s forwards;
+    opacity: 0;
+    letter-spacing: 0.2em;
+  }
+
+  .intro-btn {
+    margin-top: 3rem;
+    padding: 1rem 3rem;
+    background: transparent;
+    border: 1px solid var(--rose);
+    color: var(--rose);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.3em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    animation: titleReveal 2s ease 1s forwards;
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .intro-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--rose);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+  .intro-btn:hover::before { transform: scaleX(1); }
+  .intro-btn:hover { color: var(--midnight); cursor: pointer; }
+
+  /* ===================== MAIN SCENE ===================== */
+  #scene {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0d0718 0%, #1a0f2e 40%, #2d1b3d 70%, #1a0f1e 100%);
+  }
+
+  /* Stars */
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op); transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* Moon */
+  .moon {
+    position: fixed;
+    top: 6%;
+    right: 8%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle at 35% 35%, #fff9e6, #f0d080);
+    border-radius: 50%;
+    box-shadow: 0 0 40px 15px rgba(240, 208, 128, 0.3), 0 0 80px 30px rgba(240, 208, 128, 0.1);
+    z-index: 1;
+    animation: moonGlow 4s ease-in-out infinite;
+  }
+  @keyframes moonGlow {
+    0%, 100% { box-shadow: 0 0 40px 15px rgba(240,208,128,0.3), 0 0 80px 30px rgba(240,208,128,0.1); }
+    50% { box-shadow: 0 0 60px 25px rgba(240,208,128,0.4), 0 0 120px 50px rgba(240,208,128,0.15); }
+  }
+
+  /* ===================== COUNTER ===================== */
+  #counter {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 100;
+    background: rgba(26, 15, 30, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(242, 196, 206, 0.2);
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    min-width: 220px;
+  }
+  .counter-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--rose);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .counter-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+  .counter-time span {
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .counter-heart {
+    display: inline-block;
+    animation: heartbeat 1.2s ease-in-out infinite;
+    color: var(--rose);
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    14% { transform: scale(1.3); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.2); }
+    56% { transform: scale(1); }
+  }
+
+  /* ===================== CHERRY TREE ===================== */
+  #tree-container {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 70vh;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  #tree-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===================== PETALS ===================== */
+  .petal {
+    position: fixed;
+    pointer-events: none;
+    z-index: 3;
+    animation: petalFall linear forwards;
+  }
+  @keyframes petalFall {
+    0% { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 1; }
+    25% { transform: translateY(25vh) rotate(90deg) translateX(40px); opacity: 0.9; }
+    50% { transform: translateY(50vh) rotate(180deg) translateX(-30px); opacity: 0.7; }
+    75% { transform: translateY(75vh) rotate(270deg) translateX(50px); opacity: 0.5; }
+    100% { transform: translateY(110vh) rotate(360deg) translateX(20px); opacity: 0; }
+  }
+
+  .petal-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ===================== FIREFLIES ===================== */
+  .firefly {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ffffaa;
+    box-shadow: 0 0 6px 2px rgba(255,255,150,0.8);
+    pointer-events: none;
+    z-index: 4;
+    animation: fireflyMove var(--dur) ease-in-out infinite, fireflyBlink var(--blink) ease-in-out infinite;
+  }
+  @keyframes fireflyMove {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(var(--tx1), var(--ty1)); }
+    50% { transform: translate(var(--tx2), var(--ty2)); }
+    75% { transform: translate(var(--tx3), var(--ty3)); }
+    100% { transform: translate(0, 0); }
+  }
+  @keyframes fireflyBlink {
+    0%, 100% { opacity: 0.1; }
+    50% { opacity: 1; }
+  }
+
+  /* ===================== CONTENT ===================== */
+  #content {
+    position: relative;
+    z-index: 10;
+    padding: 6rem 2rem 4rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .main-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    color: transparent;
+    background: linear-gradient(135deg, var(--blush) 0%, var(--gold) 50%, var(--rose) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-shadow: none;
+    line-height: 1.1;
+  }
+
+  .subtitle-date {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--lavender);
+    letter-spacing: 0.3em;
+    margin-bottom: 4rem;
+  }
+
+  /* Message card */
+  .message-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(242, 196, 206, 0.15);
+    border-radius: 20px;
+    padding: 3rem;
+    margin: 2rem auto;
+    max-width: 680px;
+    position: relative;
+    overflow: hidden;
+  }
+  .message-card::before {
+    content: '"';
+    position: absolute;
+    top: -1rem;
+    left: 1.5rem;
+    font-size: 8rem;
+    font-family: 'Playfair Display', serif;
+    color: rgba(232, 134, 154, 0.15);
+    line-height: 1;
+  }
+  .message-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(242,196,206,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .message-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.9;
+    color: var(--cream);
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+
+  .message-sign {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8rem;
+    color: var(--rose);
+    margin-top: 1.5rem;
+    display: block;
+  }
+
+  /* Floating hearts */
+  .float-hearts {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .float-heart {
+    position: absolute;
+    bottom: 0;
+    font-size: var(--size);
+    animation: floatUp var(--dur) ease-in forwards;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+  }
+
+  /* ===================== MINUTE EVENTS ===================== */
+  #minute-event {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  #minute-event.active { opacity: 1; }
+
+  .minute-burst {
+    font-size: clamp(4rem, 10vw, 8rem);
+    text-align: center;
+    animation: burst 3s ease forwards;
+  }
+  .minute-msg {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--blush);
+    text-align: center;
+    text-shadow: 0 0 20px rgba(242,196,206,0.8);
+    margin-top: 1rem;
+  }
+  @keyframes burst {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    20% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+    40% { transform: scale(1) rotate(0deg); opacity: 1; }
+    70% { transform: scale(1) rotate(0deg); opacity: 1; }
+    100% { transform: scale(1.5) rotate(10deg); opacity: 0; }
+  }
+
+  /* ===================== FOOTER ===================== */
+  .footer-hearts {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: rgba(242,196,206,0.4);
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* Ground gradient */
+  .ground {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 15vh;
+    background: linear-gradient(180deg, transparent, rgba(45, 27, 61, 0.6));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    #counter { min-width: 160px; padding: 0.6rem 0.9rem; }
+    .counter-time { font-size: 0.8rem; }
+    #tree-container { width: 100vw; }
+    .message-card { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+
+<!-- ===================== INTRO ===================== -->
+<div id="intro">
+  <div class="intro-petals" id="intro-petals"></div>
+  <h1 class="intro-title">Para Você</h1>
+  <p class="intro-subtitle">uma surpresinha especial ✦</p>
+  <button class="intro-btn" onclick="enterSite()">ABRIR ❤</button>
+</div>
+
+<!-- ===================== MAIN SCENE ===================== -->
+<div id="scene" style="display:none;">
+
+  <div class="stars" id="stars"></div>
+  <div class="moon"></div>
+  <div class="ground"></div>
+
+  <!-- Counter -->
+  <div id="counter">
+    <div class="counter-label">✦ juntos há</div>
+    <div class="counter-time" id="counter-display">...</div>
+  </div>
+
+  <!-- Cherry Tree -->
+  <div id="tree-container">
+    <svg id="tree-svg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg">
+      <!-- Trunk -->
+      <path d="M295 500 Q290 440 285 400 Q280 360 275 320 Q270 280 272 250" stroke="#5c3317" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <!-- Main branches -->
+      <path d="M272 250 Q250 200 210 160 Q180 130 155 100" stroke="#6b3d1e" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M272 250 Q310 190 350 150 Q380 120 410 90" stroke="#6b3d1e" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M272 250 Q270 210 268 180 Q266 150 265 120" stroke="#6b3d1e" stroke-width="12" fill="none" stroke-linecap="round"/>
+      <!-- Sub branches left -->
+      <path d="M210 160 Q185 140 160 130 Q140 122 120 118" stroke="#7a4522" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M210 160 Q200 135 195 110 Q190 88 192 70" stroke="#7a4522" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M155 100 Q135 85 115 80 Q98 76 85 78" stroke="#8a5030" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M155 100 Q150 78 148 58 Q146 42 150 28" stroke="#8a5030" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- Sub branches right -->
+      <path d="M350 150 Q375 130 395 118 Q412 108 428 105" stroke="#7a4522" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M350 150 Q355 125 356 100 Q358 80 360 62" stroke="#7a4522" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M410 90 Q425 75 440 68 Q454 62 468 62" stroke="#8a5030" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M410 90 Q415 68 416 50 Q418 35 420 22" stroke="#8a5030" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- Tiny branches -->
+      <path d="M265 120 Q250 100 238 88" stroke="#8a5030" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M265 120 Q278 100 288 86" stroke="#8a5030" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M192 70 Q180 55 172 44" stroke="#8a5030" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M192 70 Q200 54 205 42" stroke="#8a5030" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M356 60 Q345 45 338 34" stroke="#8a5030" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M356 60 Q365 44 370 32" stroke="#8a5030" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+      <!-- Blossom clusters -->
+      <g opacity="0.95">
+        <!-- Left top cluster -->
+        <circle cx="115" cy="75" r="28" fill="#f9c8d8" opacity="0.85"/>
+        <circle cx="135" cy="60" r="24" fill="#f7b8cc" opacity="0.8"/>
+        <circle cx="100" cy="58" r="22" fill="#fce4ec" opacity="0.75"/>
+        <circle cx="148" cy="42" r="20" fill="#f9c8d8" opacity="0.8"/>
+        <circle cx="122" cy="45" r="19" fill="#fce4ec" opacity="0.7"/>
+        <circle cx="85" cy="72" r="18" fill="#f7b8cc" opacity="0.75"/>
+        <!-- Left mid cluster -->
+        <circle cx="175" cy="95" r="26" fill="#fce4ec" opacity="0.8"/>
+        <circle cx="196" cy="80" r="24" fill="#f9c8d8" opacity="0.85"/>
+        <circle cx="165" cy="78" r="20" fill="#f7b8cc" opacity="0.75"/>
+        <circle cx="205" cy="62" r="22" fill="#fce4ec" opacity="0.8"/>
+        <circle cx="185" cy="62" r="18" fill="#f9c8d8" opacity="0.7"/>
+        <!-- Center top cluster -->
+        <circle cx="255" cy="98" r="28" fill="#f9c8d8" opacity="0.85"/>
+        <circle cx="278" cy="84" r="26" fill="#fce4ec" opacity="0.8"/>
+        <circle cx="238" cy="85" r="22" fill="#f7b8cc" opacity="0.75"/>
+        <circle cx="268" cy="68" r="24" fill="#f9c8d8" opacity="0.8"/>
+        <circle cx="248" cy="65" r="20" fill="#fce4ec" opacity="0.75"/>
+        <circle cx="288" cy="65" r="20" fill="#f7b8cc" opacity="0.7"/>
+        <!-- Right mid cluster -->
+        <circle cx="358" cy="90" r="26" fill="#fce4ec" opacity="0.8"/>
+        <circle cx="370" cy="72" r="24" fill="#f9c8d8" opacity="0.85"/>
+        <circle cx="345" cy="75" r="21" fill="#f7b8cc" opacity="0.75"/>
+        <circle cx="375" cy="55" r="22" fill="#fce4ec" opacity="0.8"/>
+        <circle cx="356" cy="55" r="18" fill="#f9c8d8" opacity="0.7"/>
+        <!-- Right top cluster -->
+        <circle cx="430" cy="70" r="28" fill="#f9c8d8" opacity="0.85"/>
+        <circle cx="450" cy="55" r="24" fill="#f7b8cc" opacity="0.8"/>
+        <circle cx="415" cy="56" r="22" fill="#fce4ec" opacity="0.75"/>
+        <circle cx="465" cy="52" r="20" fill="#f9c8d8" opacity="0.8"/>
+        <circle cx="440" cy="45" r="19" fill="#fce4ec" opacity="0.7"/>
+        <circle cx="420" cy="42" r="18" fill="#f7b8cc" opacity="0.75"/>
+      </g>
+
+      <!-- Glowing hearts on tree -->
+      <text x="258" y="220" font-size="18" fill="#e8869a" opacity="0.6">♥</text>
+      <text x="310" y="195" font-size="14" fill="#f2c4ce" opacity="0.5">♥</text>
+      <text x="240" y="175" font-size="12" fill="#e8869a" opacity="0.4">♥</text>
+    </svg>
+  </div>
+
+  <!-- Fireflies container -->
+  <div id="fireflies"></div>
+
+  <!-- Floating hearts container -->
+  <div class="float-hearts" id="float-hearts"></div>
+
+  <!-- Minute event overlay -->
+  <div id="minute-event">
+    <div class="minute-burst" id="minute-burst"></div>
+    <div class="minute-msg" id="minute-msg"></div>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+    <h1 class="main-title">Feliz Dia dos<br>Namorados</h1>
+    <p class="subtitle-date">09 · 12 · 2024 — Início da nossa história, para sempre ✦</p>
+
+    <div class="message-card">
+      <p class="message-text" id="love-message">
+        Meu amor, não sei muito bem demonstrar meu amor por vc, e que isso seja uma pequena demostração do qual especial vc é para mim.
+        desde o momento que eu conheci vc minha vida ganhou cor, em vc encontrei um amor, uma amizade e mais que tudo alguém para confiar e estar ao meu lado. Vc me mostrou oq é o amor, me mostrou que comida japonesa não é tão ruim, me mostrou como é ter alguém que se preucupa, me mostrou a como ser uma pessoa melhor.
+        Lívia Moreira Neves amo vc mais que tudo, e espero que tenha gostado do presente de alguma forma kkkk, não sou muito bom com palavras mas acho que deu para enteder que vc é importante para mim.
+        <br><br>
+        Que cada pétala que cai hoje seja um lembrete de o quanto você é especial para mim.
+        Te amo mais do que as palavras conseguem dizer. 🌸
+      </p>
+      <span class="message-sign">Com todo o meu amor ♥</span>
+    </div>
+
+    <div class="footer-hearts">
+      ✦ &nbsp; para sempre ao seu lado, se não for não vai ser mais ninguém 😐🔪  &nbsp; ✦
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===================== CURSOR =====================
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+
+// ===================== INTRO PETALS =====================
+function createIntroPetal() {
+  const container = document.getElementById('intro-petals');
+  const petal = document.createElement('div');
+  const size = Math.random() * 14 + 8;
+  petal.style.cssText = `
+    position: absolute;
+    left: ${Math.random() * 100}%;
+    top: -20px;
+    width: ${size}px;
+    height: ${size}px;
+    opacity: ${Math.random() * 0.7 + 0.3};
+    animation: petalFall ${Math.random() * 4 + 3}s linear forwards;
+  `;
+  petal.innerHTML = createPetalSVG();
+  container.appendChild(petal);
+  setTimeout(() => petal.remove(), 7000);
+}
+setInterval(createIntroPetal, 300);
+
+// ===================== ENTER SITE =====================
+function enterSite() {
+  const intro = document.getElementById('intro');
+  intro.classList.add('hidden');
+  setTimeout(() => {
+    intro.style.display = 'none';
+    document.getElementById('scene').style.display = 'block';
+    initScene();
+  }, 1500);
+}
+
+// ===================== INIT SCENE =====================
+function initScene() {
+  createStars();
+  createFireflies();
+  startPetalRain();
+  updateCounter();
+  setInterval(updateCounter, 1000);
+  setInterval(dropPetal, 1000);
+  setInterval(minuteEvent, 60000);
+  // First minute event after 10s for demo feel
+  setTimeout(minuteEvent, 10000);
+}
+
+// ===================== STARS =====================
+function createStars() {
+  const container = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    const size = Math.random() * 2.5 + 0.5;
+    const dur = Math.random() * 4 + 2;
+    const minOp = Math.random() * 0.3 + 0.1;
+    star.className = 'star';
+    star.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 70}%;
+      width: ${size}px;
+      height: ${size}px;
+      --dur: ${dur}s;
+      --min-op: ${minOp};
+      animation-delay: ${Math.random() * 4}s;
+    `;
+    container.appendChild(star);
+  }
+}
+
+// ===================== FIREFLIES =====================
+function createFireflies() {
+  const container = document.getElementById('fireflies');
+  for (let i = 0; i < 18; i++) {
+    const ff = document.createElement('div');
+    ff.className = 'firefly';
+    const dur = Math.random() * 8 + 6;
+    const blink = Math.random() * 2 + 1;
+    ff.style.cssText = `
+      left: ${Math.random() * 90 + 5}%;
+      top: ${Math.random() * 60 + 20}%;
+      --dur: ${dur}s;
+      --blink: ${blink}s;
+      --tx1: ${(Math.random()-0.5)*120}px;
+      --ty1: ${(Math.random()-0.5)*80}px;
+      --tx2: ${(Math.random()-0.5)*100}px;
+      --ty2: ${(Math.random()-0.5)*100}px;
+      --tx3: ${(Math.random()-0.5)*120}px;
+      --ty3: ${(Math.random()-0.5)*80}px;
+      animation-delay: ${Math.random() * 6}s;
+    `;
+    container.appendChild(ff);
+  }
+}
+
+// ===================== PETALS =====================
+function createPetalSVG() {
+  const colors = ['#f9c8d8','#fce4ec','#f7b8cc','#f48fb1','#fdd5e2'];
+  const c = colors[Math.floor(Math.random() * colors.length)];
+  return `<svg viewBox="0 0 20 24" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="10" cy="14" rx="7" ry="10" fill="${c}" opacity="0.85" transform="rotate(${Math.random()*20-10},10,14)"/>
+    <ellipse cx="10" cy="8" rx="4" ry="7" fill="${c}" opacity="0.6"/>
+  </svg>`;
+}
+
+function dropPetal() {
+  const petal = document.createElement('div');
+  const size = Math.random() * 16 + 10;
+  const startX = Math.random() * 70 + 15; // mostly center-ish (tree area)
+  const duration = Math.random() * 5 + 6;
+  petal.className = 'petal';
+  petal.style.cssText = `
+    left: ${startX}%;
+    top: -30px;
+    width: ${size}px;
+    height: ${size * 1.2}px;
+    animation-duration: ${duration}s;
+    animation-delay: ${Math.random() * 0.5}s;
+  `;
+  petal.innerHTML = createPetalSVG();
+  document.body.appendChild(petal);
+  setTimeout(() => petal.remove(), (duration + 1) * 1000);
+}
+
+function startPetalRain() {
+  // Initial burst
+  for (let i = 0; i < 8; i++) {
+    setTimeout(dropPetal, i * 200);
+  }
+}
+
+// ===================== COUNTER =====================
+function updateCounter() {
+  const start = new Date('2024-12-09T00:00:00');
+  const now = new Date();
+  const diff = now - start;
+
+  const totalSecs = Math.floor(diff / 1000);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  document.getElementById('counter-display').innerHTML = `
+    <span>${days}</span> dias <span class="counter-heart">♥</span><br>
+    <span>${String(hours).padStart(2,'0')}</span>h 
+    <span>${String(minutes).padStart(2,'0')}</span>m 
+    <span>${String(seconds).padStart(2,'0')}</span>s
+  `;
+}
+
+// ===================== MINUTE EVENTS =====================
+const minuteEvents = [
+  { emoji: '💖', msg: 'Te amo mais a cada minuto!' },
+  { emoji: '🌸🌸🌸', msg: 'Você ilumina os meus dias' },
+  { emoji: '✨', msg: 'Feliz Dia dos Namorados, meu amor!' },
+  { emoji: '🦋', msg: 'Você é minha pessoa favorita' },
+  { emoji: '💫', msg: 'Obrigado por tudo que você é' },
+  { emoji: '🌙', msg: 'Cada momento ao seu lado é especial' },
+  { emoji: '🌺', msg: 'Meu coração é seu, sempre' },
+  { emoji: '💝', msg: 'Amo você do fundo do meu coração' },
+];
+
+let minuteEventIndex = 0;
+
+function minuteEvent() {
+  const ev = minuteEvents[minuteEventIndex % minuteEvents.length];
+  minuteEventIndex++;
+
+  const overlay = document.getElementById('minute-event');
+  document.getElementById('minute-burst').textContent = ev.emoji;
+  document.getElementById('minute-msg').textContent = ev.msg;
+  overlay.classList.add('active');
+
+  // Launch floating hearts
+  launchHearts();
+
+  setTimeout(() => overlay.classList.remove('active'), 4000);
+}
+
+function launchHearts() {
+  const container = document.getElementById('float-hearts');
+  const emojis = ['💖','💕','❤️','💗','💓','🌸','✨'];
+  for (let i = 0; i < 12; i++) {
+    const h = document.createElement('div');
+    h.className = 'float-heart';
+    h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    const size = Math.random() * 1.5 + 1;
+    const dur = Math.random() * 3 + 3;
+    h.style.cssText = `
+      left: ${Math.random() * 100}%;
+      --size: ${size}rem;
+      --dur: ${dur}s;
+      font-size: ${size}rem;
+      animation-delay: ${Math.random() * 1}s;
+    `;
+    container.appendChild(h);
+    setTimeout(() => h.remove(), (dur + 1) * 1000);
+  }
+}
+</script>
+</body>
+</html>
